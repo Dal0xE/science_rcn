@@ -84,6 +84,9 @@ class LearningPrompt(Cmd):
                             elif num_workers == 1:
                                 num_workers = None
                             pool = Pool(num_workers)
+                        elif modarg != 'verbose':
+                            if all_model_factors != None:
+                                print "Model must be retrained for changed variable to take effect."
                     except IndexError:
                         print "No value provided for argument: {}".format(modarg)
                         continue
