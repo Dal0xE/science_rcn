@@ -21,6 +21,11 @@ parallel = True
 verbose = False
 seed = 5
 
+all_model_factors = None
+
+num_workers = None if parallel else 1
+pool = Pool(num_workers)
+
 def grab_training_data(ndir, train_size, test_size, full_test_set=False, seed=5):
     if not os.path.isdir(ndir)
     def _load_data(image_dir, num_per_class, get_filenames=False):
@@ -57,9 +62,13 @@ class LearningPrompt(Cmd):
             print "Training on preset data..."
             train_data = grab_training_data(data_dir)
         else:
-
+            if args.startswith('/'):
+                data_dir = args
+            else:
+                data_dir += args
         train_partial = partial(train_image, perturb_factor=perturb_factor)
         train_results = pool.map_async(train_partial, [d[0] for d in train_data]).get(9999999)
+        all_model_factors = zip(*train_results)
     def do_set(self, args):
         '''Sets values for model arguments. Can handle one or multiple arguments at once. Use 'argument: value' notation, and be sure to enclose strings in quotation marks. Note: function uses eval, and is thus unsafe for untrusted sources.'''
         args = args.split(' ')
@@ -69,6 +78,12 @@ class LearningPrompt(Cmd):
                 if modarg in model_args:
                     try:
                         eval(modarg) = eval(args[x + 1])
+                        if modarg == 'parallel':
+                            if num_workers == None:
+                                num_workers = 1
+                            elif num_workers == 1:
+                                num_workers = None
+                            pool = Pool(num_workers)
                     except IndexError:
                         print "No value provided for argument: {}".format(modarg)
                         continue
