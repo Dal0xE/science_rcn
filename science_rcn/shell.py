@@ -95,3 +95,16 @@ class LearningPrompt(Cmd):
                     continue
             else:
                 continue
+    def do_reset_values(self, args):
+        '''Resets all model arguments to their defaults. Does not change parallelization.'''
+        data_dir = 'data'
+        train_size = 20
+        test_size = 20
+        full_test_set = False
+        pool_shape = (25, 25)
+        perturb_factor = 2.
+        verbose = False
+        seed = 5
+        all_model_factors = None
+        num_workers = None if parallel else 1
+        pool = Pool(num_workers)
